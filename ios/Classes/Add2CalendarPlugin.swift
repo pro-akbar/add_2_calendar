@@ -100,9 +100,10 @@ public class Add2CalendarPlugin: NSObject, FlutterPlugin {
     func presentCalendarModalToAddEvent(_ event: EKEvent, eventStore: EKEventStore, completion: ((_ success: Bool) -> Void)? = nil) {
         if #available(iOS 17, *) {
             OperationQueue.main.addOperation {
-                self.presentEventCalendarDetailModal(event: event, eventStore: eventStore)
+                self.presentEventCalendarDetailModal(event: event, eventStore: eventStore, completion: { result in
+                    completion?(result)
+                })
             }
-            completion?(true)
         } else {
             let authStatus = getAuthorizationStatus()
             switch authStatus {
@@ -136,7 +137,7 @@ public class Add2CalendarPlugin: NSObject, FlutterPlugin {
     
     // Present edit event calendar modal
     
-    func presentEventCalendarDetailModal(event: EKEvent, eventStore: EKEventStore) {
+    func presentEventCalendarDetailModal(event: EKEvent, eventStore: EKEventStore, completion: ((_ success: Bool) -> Void)? = nil) {
         let eventModalVC = EKEventEditViewController()
         eventModalVC.event = event
         eventModalVC.eventStore = eventStore
@@ -150,6 +151,7 @@ public class Add2CalendarPlugin: NSObject, FlutterPlugin {
             root.present(eventModalVC, animated: true, completion: {
                 statusBarStyle = UIApplication.shared.statusBarStyle
                 UIApplication.shared.statusBarStyle = UIStatusBarStyle.default
+                completion?(true)
             })
         }
     }
